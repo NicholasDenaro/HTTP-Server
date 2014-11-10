@@ -1,0 +1,86 @@
+<html color="#00FFFF">
+	<style>
+		html, body
+		{
+			width: 100%;
+			height: 100%
+		}
+		#console
+		{
+			width: 640px;
+			height: 320px;
+		}
+	</style>
+	<script>
+	
+		var socket=null;
+		var out;
+		var time;
+		
+		function init()
+		{
+			out=document.getElementById("console");
+		}
+		
+		function run()
+		{
+			if("WebSocket" in window)
+			{
+				log("starting");
+				socket=new WebSocket("ws://66.71.87.171:9400");
+				log("Socket created.");
+			    socket.onopen=function()
+			    {
+			    	log("Connected!");
+					sendMessage("Ping");
+					log("Message sent...");
+			    };
+			    
+			    socket.onmessage=function(data)
+			    {
+			    	log(data.data+" "+(new Date().getTime()-time)+" ms");
+			    	sendMessage("Ping");
+			    };
+			    
+			    socket.onclose=function() 
+			    {
+			    	log("Disconnected!");
+			    };
+			    log("end run");
+			}
+			else
+			{
+				log("WebSocket NOT supported by your browser!");
+			}
+			   
+		}
+		
+		function kill()
+		{
+			socket.close();
+		}
+		
+		function sendMessage(mes)
+		{
+			log("Sending: "+mes);
+			socket.send(mes);
+			time=new Date().getTime();
+		}
+		
+		function log(mes)
+		{
+			out.innerHTML+=mes+"\n";
+			out.scrollTop = out.scrollHeight;
+		}
+	</script>
+	<body onload="init();">
+		<div>
+			<button onclick="run();">connect</button>
+			<button onclick="kill();">kill</button>
+			<button onclick="sendMessage('Ping');">Ping</button>
+		</div>
+		<div>
+			<textarea id="console"></textarea>
+		</div>
+	</body>
+</html>
