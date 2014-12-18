@@ -28,6 +28,7 @@
 			{
 				log("starting");
 				socket=new WebSocket("ws://66.71.87.171:9400");
+				//socket=new WebSocket("ws://25.46.16.229:9400");
 				log("Socket created.");
 			    socket.onopen=function()
 			    {
@@ -39,7 +40,7 @@
 			    socket.onmessage=function(data)
 			    {
 			    	log(data.data+" "+(new Date().getTime()-time)+" ms");
-			    	sendMessage("Ping");
+			    	//sendMessage("Ping");
 			    };
 			    
 			    socket.onclose=function() 
@@ -53,6 +54,15 @@
 				log("WebSocket NOT supported by your browser!");
 			}
 			   
+		}
+		
+		function login()
+		{
+			var username=document.getElementById("userid").value;
+			var password=document.getElementById("pass").value;
+			
+			log("username: "+username);
+			log("password: "+password);
 		}
 		
 		function kill()
@@ -78,6 +88,11 @@
 			<button onclick="run();">connect</button>
 			<button onclick="kill();">kill</button>
 			<button onclick="sendMessage('Ping');">Ping</button>
+		</div>
+		<div>
+			<input id="userid" placeholder="Username"></input>
+			<input id="pass" placeholder="Password"></input>
+			<button onclick="login();">Log in</button>
 		</div>
 		<div>
 			<textarea id="console"></textarea>

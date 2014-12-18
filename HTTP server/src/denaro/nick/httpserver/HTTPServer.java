@@ -8,13 +8,28 @@ import java.security.NoSuchAlgorithmException;
 
 public class HTTPServer extends Thread
 {
-	public HTTPServer() throws IOException
+	public HTTPServer()
 	{
-		server=new ServerSocket();
-		server.setReuseAddress(true);
-		server.bind(new InetSocketAddress("66.71.87.171",9400));
-		//server.bind(new InetSocketAddress("localhost",9400));
+		try
+		{
+			server=new ServerSocket();
+			server.setReuseAddress(true);
+			server.bind(new InetSocketAddress("localhost",9400));
+		}
+		catch(IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		System.out.println("Server bound to "+server.getLocalSocketAddress());
+	}
+	
+	public void add(Socket socket) throws NoSuchAlgorithmException, IOException
+	{
+		HTTPClient client=new HTTPClient(socket);
+		if(!socket.isClosed())
+			client.start();
 	}
 	
 	public void run()
@@ -26,9 +41,7 @@ public class HTTPServer extends Thread
 			try
 			{
 				Socket socket=server.accept();
-				HTTPClient client=new HTTPClient(socket);
-				if(!socket.isClosed())
-					client.start();
+				add(socket);
 			}
 			catch(IOException | NoSuchAlgorithmException e)
 			{

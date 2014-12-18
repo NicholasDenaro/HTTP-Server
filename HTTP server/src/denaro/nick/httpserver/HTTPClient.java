@@ -26,11 +26,20 @@ public class HTTPClient extends Thread
 		//out=new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 		out=socket.getOutputStream();
 		
-		handShake();
+		connect=true;
+		
+		if(!handShake())
+		{
+			connect=false;
+		}
 	}
+	
+	private boolean connect;
 	
 	public void run()
 	{
+		if(!connect)
+			return;
 		running=true;
 		
 		while(running)
@@ -70,10 +79,11 @@ public class HTTPClient extends Thread
 					
 					String mes=decode64(data,mask);
 					
-					if(mes.equals("Ping"))
+					/*if(mes.equals("Ping"))
 					{
 						sendMessage("Pong");
-					}
+					}*/
+					handleMessage(mes);
 				}
 			}
 			catch(IOException | UnsupportedOperationException e)
@@ -85,7 +95,12 @@ public class HTTPClient extends Thread
 		System.out.println("---------------\nClient stopped!\n---------------");
 	}
 	
-	public void handShake() throws IOException, NoSuchAlgorithmException
+	public void handleMessage(String message) throws IOException
+	{
+		
+	}
+	
+	public boolean handShake() throws IOException, NoSuchAlgorithmException
 	{
 		System.out.println("handshake");
 		BufferedReader bufin=new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -100,7 +115,7 @@ public class HTTPClient extends Thread
 				if(get.equals("/index.html"))
 				{
 					servePage();
-					return;
+					return false;
 				}
 			}
 			if(line.contains("Sec-WebSocket-Key:"))
@@ -113,6 +128,8 @@ public class HTTPClient extends Thread
 		}
 		
 		sendHeaders();
+		
+		return(true);
 	}
 	
 	public static String createKey(String k) throws NoSuchAlgorithmException, UnsupportedEncodingException
@@ -223,7 +240,7 @@ public class HTTPClient extends Thread
 		out.close();
 	}
 	
-	private void sendMessage(String message) throws IOException
+	public void sendMessage(String message) throws IOException
 	{
 		ByteBuffer buf=ByteBuffer.allocate(1+1+message.length());
 		buf.put((byte)129);
